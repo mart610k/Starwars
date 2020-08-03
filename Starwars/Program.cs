@@ -1,7 +1,8 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Starwars
@@ -10,6 +11,106 @@ namespace Starwars
     {
         static void Main(string[] args)
         {
+            List<Planet> planets = LoadData();
+
+            //---(Task 1 Linq)--- 
+            Console.WriteLine("---(Task 1)---");
+            List<Planet> planetsStartingWithM = new List<Planet>(from Planet in planets where Planet.Name.StartsWith("M") select Planet);
+            PrintAllNames(planetsStartingWithM);
+
+            //---(Task 2)---
+            Console.WriteLine("---(Task 2)---");
+            List<Planet> planetsContainsY = new List<Planet>(from Planet in planets where Planet.Name.Contains("y") || Planet.Name.Contains("Y") select Planet);
+            PrintAllNames(planetsContainsY);
+
+            //---(Task 3)---
+            Console.WriteLine("---(Task 3)---");
+            List<Planet> planetsWithBetween6and15Letters = new List<Planet>(from Planet in planets where Planet.Name.Length > 9 && Planet.Name.Length < 15 select Planet);
+            PrintAllNames(planetsWithBetween6and15Letters);
+
+            //--(Task 4)---
+            Console.WriteLine("---(Task 4)---");
+            List<Planet> planetsWith2aAndEndsWithE = new List<Planet>(from Planet in planets where Planet.Name.IndexOf("a") == 1 && Planet.Name.EndsWith("e") select Planet);
+            PrintAllNames(planetsWith2aAndEndsWithE);
+
+            //Task 5
+            Console.WriteLine("---(Task 5)---");
+            List<Planet> planetsWithRotationPeriodSortedAsc = new List<Planet>(from Planet in planets where Planet.RotationPeriod > 40 orderby Planet.RotationPeriod ascending select Planet);
+            PrintAllNames(planetsWithRotationPeriodSortedAsc);
+
+            //Task 6
+            Console.WriteLine("---(Task 6)---");
+            List<Planet> planetsRotationBetween10and20SortAscNmae = new List<Planet>(from Planet in planets where Planet.RotationPeriod > 10 && Planet.RotationPeriod < 20 orderby Planet.Name ascending select Planet);
+            PrintAllNames(planetsRotationBetween10and20SortAscNmae);
+
+            //Task 7
+            Console.WriteLine("---(Task 7)---");
+            List<Planet> planetsRotationPeriodover30OrderByNameRotation = new List<Planet>(from Planet in planets where Planet.RotationPeriod > 30 orderby Planet.Name ascending, Planet.RotationPeriod select Planet);
+            PrintAllNames(planetsRotationPeriodover30OrderByNameRotation);
+
+            //Task 8
+            Console.WriteLine("---(Task 8)---");
+            List<Planet> PlanetswithRotation30SurfaceWater50andContainsbaSortedNameSurfacewaterRotationPeriod = new List<Planet>(from Planet in planets where (Planet.RotationPeriod > 30 || Planet.SurfaceWater > 50) && Planet.Name.Contains("ba") orderby Planet.Name ascending, Planet.SurfaceWater ascending, Planet.RotationPeriod ascending select Planet);
+            PrintAllNames(PlanetswithRotation30SurfaceWater50andContainsbaSortedNameSurfacewaterRotationPeriod);
+
+            //Task 9
+            Console.WriteLine("---(Task 9)---");
+            List<Planet> PlanetWithSurfaceWaterSortedBySurfaceDesc = new List<Planet>(from Planet in planets where Planet.SurfaceWater > 0 orderby Planet.SurfaceWater descending select Planet);
+            PrintAllNames(PlanetWithSurfaceWaterSortedBySurfaceDesc);
+
+            //Task 10
+            Console.WriteLine("---(Task 10)---");
+            List<Planet> PlanetsWithHighestSurfaceArea = new List<Planet>(from Planet in planets where Planet.Diameter != 0 && Planet.Population != 0 orderby ((Math.PI * 4) * (Math.Pow(Planet.Diameter / 2, 4)) / Planet.Population) ascending select Planet);
+            PrintAllNames(PlanetsWithHighestSurfaceArea);
+
+            //Task 11
+            Console.WriteLine("---(Task 11)---");
+            List<Planet> PlanetsWithWithRoationPeriod = new List<Planet>(planets.Except(planets, new NoRotationComparer()));
+            PrintAllNames(PlanetsWithWithRoationPeriod);
+
+            //Task 12
+            Console.WriteLine("---(Task 12)---");
+            List<Planet> planetsWithStartsWithAorEndsWithS = new List<Planet>(from Planet in planets where Planet.Name.ToLower().StartsWith("a") || Planet.Name.ToLower().EndsWith("s") select Planet);
+            List<Planet> planetsWithRainForest = new List<Planet>(planets.Where(planet => planet.Terrain != null && planet.Terrain.Contains("rainforests")));
+            List<Planet> Combined = new List<Planet>((from Planet in planetsWithStartsWithAorEndsWithS select Planet).Union(from Planet in planetsWithRainForest select Planet));
+            PrintAllNames(Combined);
+
+            //Task 13
+            Console.WriteLine("---(Task 13)---");
+            List<Planet> DesertsPlanets = new List<Planet>(planets.Where(planet => planet.Terrain != null && (planet.Terrain.Contains("deserts") || planet.Terrain.Contains("desert") || planet.Terrain.Contains("rocky desert"))));
+            PrintAllNames(DesertsPlanets);
+
+
+            //Task 14
+            Console.WriteLine("---(Task 14)---");
+            List<Planet> Swamps = new List<Planet>((planets.Where(planet => planet.Terrain != null && (planet.Terrain.Contains("swamp") || planet.Terrain.Contains("swamps")))).OrderBy(planet => planet.RotationPeriod).ThenBy(planet => planet.Name));
+            PrintAllNames(Swamps);
+
+
+            //Test 15
+            Console.WriteLine("Task 15");
+            //List<Planet> 
+            List<Planet> doubleVowel = new List<Planet>(planets.Where(i => Regex.IsMatch(i.Name.ToLower(), @"([aeiou])\1")));
+            PrintAllNames(doubleVowel);
+
+            //Task 16
+            Console.WriteLine("Task 16");
+            List<Planet> doubleSomeLetters = new List<Planet>(planets.Where(i => (Regex.IsMatch(i.Name.ToLower(), @"([klrn])\1"))).OrderByDescending(i => i.Name));
+            PrintAllNames(doubleSomeLetters);
+            Console.ReadKey();
+        }
+
+
+
+        static void PrintAllNames(List<Planet> planets)
+        {
+            for (int i = 0; i < planets.Count; i++)
+            {
+                Console.WriteLine(planets[i].Name);
+            }
+            Console.ReadKey();
+            Console.Clear();
+        }
 
         static List<Planet> LoadData()
         {
